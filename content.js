@@ -10,7 +10,7 @@ const chatContainer = document.createElement('div');
 chatContainer.id = 'web-chat-container';
 chatContainer.innerHTML = `
   <div class="web-chat-header">
-    <span>胡聊网页助手</span>
+    <span>网页胡聊助手</span>
     <div class="web-chat-controls">
       <button id="web-chat-clear" class="web-chat-icon-btn" title="清空聊天">+</button>
       <button id="web-chat-close" class="web-chat-icon-btn">×</button>
@@ -80,7 +80,7 @@ function sendUserMessage() {
   addMessage(message, 'user');
   chatInput.value = '';
   
-  // 保存用户消息到历史记录
+  // 保存用户消息到历史记录 - 只保存用户问题
   saveChatMessage(message, 'user');
   
   // 是否需要获取网页内容
@@ -247,9 +247,20 @@ function loadChatHistory() {
     // 清空当前聊天窗口
     chatMessages.innerHTML = '';
     
-    // 添加历史消息
+    // 添加历史消息，跳过包含"网页内容："的消息
     urlHistory.forEach(message => {
-      addMessage(message.text, message.sender);
+      // 过滤掉包含网页内容的消息
+      if (message.sender === 'user' && message.text.includes('网页内容：')) {
+        // 从消息中提取实际的用户问题
+        const userQuestionMatch = message.text.match(/用户问题：(.+)$/);
+        if (userQuestionMatch && userQuestionMatch[1]) {
+          // 只显示用户问题部分
+          addMessage(userQuestionMatch[1], 'user');
+        }
+      } else {
+        // 正常显示其他消息
+        addMessage(message.text, message.sender);
+      }
     });
     
     // 恢复对话状态

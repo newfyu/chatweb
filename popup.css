@@ -104,6 +104,7 @@ h1 {
   background-color: #e9eaec;
   color: #333;
   align-self: flex-start;
+  max-width: 95%;
 }
 
 /* 确保bot-message内的所有元素继承颜色 */
