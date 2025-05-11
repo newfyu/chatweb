@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>网页内容聊天助手</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>网页内容聊天助手</h1>
+      <div class="header-controls">
+        <button id="clearChat" class="icon-btn" title="清空聊天记录">+</button>
+        <button id="settingsBtn" class="icon-btn" title="设置">⋮</button>
+      </div>
+    </div>
+    
+    <div id="chatPanel" class="panel active">
+      <div id="chatMessages" class="chat-messages"></div>
+      <div class="input-area">
+        <textarea id="userInput" placeholder="输入您的问题..."></textarea>
+        <button id="sendButton">↑</button>
+      </div>
+    </div>
+    
+    <div id="settingsPanel" class="panel">
+      <div class="setting-item">
+        <label for="apiEndpoint">API 端点</label>
+        <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+      </div>
+      <div class="setting-item">
+        <label for="apiKey">API 密钥</label>
+        <input type="password" id="apiKey" placeholder="您的API密钥">
+      </div>
+      <div class="setting-item">
+        <label for="modelName">模型名称</label>
+        <input type="text" id="modelName" placeholder="gpt-3.5-turbo">
+      </div>
+      <div class="settings-buttons">
+        <button id="saveSettings">保存</button>
+        <button id="backToChat" class="secondary-btn">返回</button>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 

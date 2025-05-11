@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "网页内容聊天助手",
+  "version": "1.0",
+  "description": "基于网页内容回答问题的聊天助手，支持连续对话",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "网页内容聊天助手"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+} 
