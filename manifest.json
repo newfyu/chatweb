@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "网页内容聊天助手",
+  "name": "胡聊网页助手",
   "version": "1.0",
   "description": "基于网页内容回答问题的聊天助手，支持连续对话",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "网页内容聊天助手"
+    "default_title": "胡聊网页助手"
   },
   "permissions": [
     "activeTab",

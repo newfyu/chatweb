@@ -10,7 +10,7 @@ const chatContainer = document.createElement('div');
 chatContainer.id = 'web-chat-container';
 chatContainer.innerHTML = `
   <div class="web-chat-header">
-    <span>网页内容聊天助手</span>
+    <span>胡聊网页助手</span>
     <div class="web-chat-controls">
       <button id="web-chat-clear" class="web-chat-icon-btn" title="清空聊天">+</button>
       <button id="web-chat-close" class="web-chat-icon-btn">×</button>

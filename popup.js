@@ -6,10 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const userInput = document.getElementById('userInput');
   const sendButton = document.getElementById('sendButton');
   const settingsBtn = document.getElementById('settingsBtn');
+  const settingsIcon = document.getElementById('settingsIcon');
+  const backIcon = document.getElementById('backIcon');
   const backToChat = document.getElementById('backToChat');
   const apiEndpoint = document.getElementById('apiEndpoint');
   const apiKey = document.getElementById('apiKey');
   const modelName = document.getElementById('modelName');
+  const temperature = document.getElementById('temperature');
+  const temperatureValue = document.getElementById('temperatureValue');
   const saveSettings = document.getElementById('saveSettings');
   const clearChat = document.getElementById('clearChat');
 
@@ -19,15 +23,39 @@ document.addEventListener('DOMContentLoaded', function() {
   let hasWebPageContext = false;
   // 当前页面URL
   let currentUrl = '';
+  // 当前是否在设置面板
+  let isInSettings = false;
+  
+  // 初始化清空按钮的可见性 - 根据当前激活的面板设置
+  if (settingsPanel.classList.contains('active')) {
+    clearChat.style.display = 'none';
+    setButtonToBackMode();
+  } else {
+    clearChat.style.display = 'flex';
+    setButtonToSettingsMode();
+  }
+
+  // 温度滑块值变化时更新显示
+  temperature.addEventListener('input', function() {
+    temperatureValue.textContent = this.value;
+  });
 
   // 加载聊天历史记录
   loadChatHistory();
 
   // 加载设置
-  chrome.storage.sync.get(['apiEndpoint', 'apiKey', 'modelName'], function(result) {
+  chrome.storage.sync.get(['apiEndpoint', 'apiKey', 'modelName', 'temperature'], function(result) {
     apiEndpoint.value = result.apiEndpoint || 'https://api.openai.com/v1/chat/completions';
     apiKey.value = result.apiKey || '';
     modelName.value = result.modelName || 'gpt-3.5-turbo';
+    
+    if (result.temperature !== undefined) {
+      temperature.value = result.temperature;
+      temperatureValue.textContent = result.temperature;
+    } else {
+      temperature.value = 0.7;
+      temperatureValue.textContent = "0.7";
+    }
   });
 
   // 保存设置
@@ -35,18 +63,23 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.sync.set({
       apiEndpoint: apiEndpoint.value,
       apiKey: apiKey.value,
-      modelName: modelName.value
+      modelName: modelName.value,
+      temperature: temperature.value
     }, function() {
       showChatPanel();
     });
   });
 
-  // 显示设置面板
+  // 设置/返回按钮点击处理
   settingsBtn.addEventListener('click', function() {
-    showSettingsPanel();
+    if (isInSettings) {
+      showChatPanel();
+    } else {
+      showSettingsPanel();
+    }
   });
 
-  // 返回聊天面板
+  // 返回聊天面板（底部返回按钮）
   backToChat.addEventListener('click', function() {
     showChatPanel();
   });
@@ -55,12 +88,32 @@ document.addEventListener('DOMContentLoaded', function() {
   function showChatPanel() {
     chatPanel.classList.add('active');
     settingsPanel.classList.remove('active');
+    clearChat.style.display = 'flex';
+    setButtonToSettingsMode();
+    isInSettings = false;
   }
 
   // 切换到设置面板
   function showSettingsPanel() {
     settingsPanel.classList.add('active');
     chatPanel.classList.remove('active');
+    clearChat.style.display = 'none';
+    setButtonToBackMode();
+    isInSettings = true;
+  }
+
+  // 设置按钮为设置模式
+  function setButtonToSettingsMode() {
+    settingsIcon.style.display = 'block';
+    backIcon.style.display = 'none';
+    settingsBtn.title = '设置';
+  }
+
+  // 设置按钮为返回模式
+  function setButtonToBackMode() {
+    settingsIcon.style.display = 'none';
+    backIcon.style.display = 'block';
+    settingsBtn.title = '返回';
   }
 
   // 清空聊天历史
@@ -241,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
     saveChatMessage(currentUrl, currentConversation[currentConversation.length - 1].content, 'user');
 
     // 获取设置
-    chrome.storage.sync.get(['apiEndpoint', 'apiKey', 'modelName'], function(result) {
+    chrome.storage.sync.get(['apiEndpoint', 'apiKey', 'modelName', 'temperature'], function(result) {
       if (!result.apiKey) {
         const errorMsg = '请在设置中配置API密钥';
         
@@ -262,10 +315,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
+      // 获取温度参数，默认为0.7
+      const tempValue = result.temperature !== undefined ? parseFloat(result.temperature) : 0.7;
+
       // 添加调试信息
       console.log('发送至API:', {
         endpoint: result.apiEndpoint,
         model: result.modelName,
+        temperature: tempValue,
         messagesCount: currentConversation.length
       });
 
@@ -278,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({
           model: result.modelName,
           messages: currentConversation,
-          temperature: 0.7
+          temperature: tempValue
         })
       })
       .then(response => {
