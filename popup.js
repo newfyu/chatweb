@@ -197,16 +197,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
     messageDiv.classList.add(sender + '-message');
-    messageDiv.textContent = text;
+    
+    // 如果是机器人消息，使用markdown-it渲染
+    if (sender === 'bot') {
+      try {
+        // 初始化markdown-it
+        const md = window.markdownit({
+          html: false,         // 禁用HTML标签
+          breaks: true,        // 将换行符转换为<br>
+          linkify: true        // 自动将URL转换为链接
+        });
+        
+        // 渲染markdown
+        messageDiv.innerHTML = md.render(text);
+        
+        // 为所有链接添加target="_blank"以便在新窗口打开
+        const links = messageDiv.querySelectorAll('a');
+        links.forEach(link => {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        });
+      } catch (error) {
+        console.error('Markdown渲染失败:', error);
+        messageDiv.textContent = text;
+      }
+    } else {
+      // 用户消息保持为纯文本
+      messageDiv.textContent = text;
+    }
+    
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageDiv;
   }
 
   function askLLM(currentUrl) {
     // 显示加载消息
     const loadingId = 'loading-' + Date.now();
-    addMessage('正在思考...', 'bot');
-    const loadingElement = chatMessages.lastChild;
+    const loadingElement = addMessage('正在思考...', 'bot');
     loadingElement.id = loadingId;
 
     // 保存用户问题到聊天历史
@@ -216,7 +244,20 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.sync.get(['apiEndpoint', 'apiKey', 'modelName'], function(result) {
       if (!result.apiKey) {
         const errorMsg = '请在设置中配置API密钥';
-        loadingElement.textContent = errorMsg;
+        
+        try {
+          // 初始化markdown-it
+          const md = window.markdownit({
+            html: false,
+            breaks: true,
+            linkify: true
+          });
+          
+          loadingElement.innerHTML = md.render(errorMsg);
+        } catch (error) {
+          loadingElement.textContent = errorMsg;
+        }
+        
         saveChatMessage(currentUrl, errorMsg, 'bot');
         return;
       }
@@ -248,7 +289,26 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(data => {
         const answer = data.choices[0].message.content;
-        loadingElement.textContent = answer;
+        
+        try {
+          // 初始化markdown-it
+          const md = window.markdownit({
+            html: false,
+            breaks: true,
+            linkify: true
+          });
+          
+          loadingElement.innerHTML = md.render(answer);
+          
+          // 为所有链接添加target="_blank"以便在新窗口打开
+          const links = loadingElement.querySelectorAll('a');
+          links.forEach(link => {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+          });
+        } catch (error) {
+          loadingElement.textContent = answer;
+        }
         
         // 将AI回答添加到对话历史
         currentConversation.push({
@@ -261,7 +321,20 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(error => {
         const errorMsg = '出错了: ' + error.message;
-        loadingElement.textContent = errorMsg;
+        
+        try {
+          // 初始化markdown-it
+          const md = window.markdownit({
+            html: false,
+            breaks: true,
+            linkify: true
+          });
+          
+          loadingElement.innerHTML = md.render(errorMsg);
+        } catch (error) {
+          loadingElement.textContent = errorMsg;
+        }
+        
         saveChatMessage(currentUrl, errorMsg, 'bot');
       });
     });
