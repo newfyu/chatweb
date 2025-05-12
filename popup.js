@@ -282,8 +282,10 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.textContent = text;
       }
     } else {
-      // 用户消息保持为纯文本
-      messageDiv.textContent = text;
+      // 用户消息也用p标签包裹，保持一致的样式
+      const p = document.createElement('p');
+      p.textContent = text;
+      messageDiv.appendChild(p);
     }
     
     chatMessages.appendChild(messageDiv);

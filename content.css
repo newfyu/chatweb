@@ -114,10 +114,15 @@
 
 .web-chat-message {
   margin-bottom: 10px;
-  padding: 8px 12px;
+  padding: 12px;
   border-radius: 18px;
   max-width: 95%;
   word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.web-chat-message p {
+  margin: 0;
 }
 
 .user-message {

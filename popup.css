@@ -85,12 +85,17 @@ h1 {
 
 .message {
   margin-bottom: 10px;
-  padding: 8px 12px;
+  padding: 12px;
   border-radius: 18px;
   max-width: 80%;
   word-wrap: break-word;
   display: flex;
   flex-direction: column;
+  line-height: 1.4;
+}
+
+.message p {
+  margin: 0;
 }
 
 .user-message {
